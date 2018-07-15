@@ -12,8 +12,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
+import org.kodluyoruz.milliyet_watchface.api.model.GitHubRepo;
+import org.kodluyoruz.milliyet_watchface.api.model.SNODataClass;
+import org.kodluyoruz.milliyet_watchface.api.service.SNOClient;
+import org.kodluyoruz.milliyet_watchface.api.service.ServiceGenerator;
 import org.kodluyoruz.milliyet_watchface.mock.MockDatabase;
 import org.kodluyoruz.milliyet_watchface.util.NotificationUtil;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -31,6 +41,42 @@ public class MainActivity extends AppCompatActivity {
         setContentView( R.layout.activity_main );
 
         mNotificationManagerCompat = NotificationManagerCompat.from( getApplicationContext() );
+
+        sendRequest();
+    }
+
+    private void sendRequest() {
+        SNOClient client = ServiceGenerator.createService( SNOClient.class );
+        Call<SNODataClass> call = client.reposForUser( "39217" );
+
+        call.enqueue( new Callback<SNODataClass>() {
+            @Override
+            public void onResponse(Call<SNODataClass> call, Response<SNODataClass> response) {
+                response.body();
+            }
+
+            @Override
+            public void onFailure(Call<SNODataClass> call, Throwable t) {
+
+            }
+        } );
+
+        ServiceGenerator.changeApiBaseUrl( "https://api.github.com/" );
+        SNOClient clientGitHub = ServiceGenerator.createService( SNOClient.class );
+        Call<List<GitHubRepo>> repoCall = clientGitHub.reposForGitHub( "cangur" );
+
+        repoCall.enqueue( new Callback<List<GitHubRepo>>() {
+            @Override
+            public void onResponse(Call<List<GitHubRepo>> call, Response<List<GitHubRepo>> response) {
+                response.body();
+            }
+
+            @Override
+            public void onFailure(Call<List<GitHubRepo>> call, Throwable t) {
+
+            }
+        } );
+
     }
 
     public void onClick(View view) {
