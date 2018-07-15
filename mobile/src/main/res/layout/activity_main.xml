@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mainRelativeLayout"
     android:layout_width="match_parent"
@@ -12,17 +11,24 @@
     tools:context=".MainActivity">
 
     <TextView
+        android:id="@+id/spinnerHeadertextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Send notification..."
-        android:id="@+id/spinnerHeadertextView"/>
+        android:text="Send notification..." />
+
+    <ImageView
+        android:id="@+id/main_activity_imageview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true" />
 
     <Button
+        android:id="@+id/submit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Launch!"
-        android:onClick="onClick"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
-        android:id="@+id/submit"/>
+        android:onClick="onClick"
+        android:text="Launch!" />
 </RelativeLayout>

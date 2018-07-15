@@ -26,6 +26,7 @@ import android.support.wearable.watchface.WatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.Gravity;
 import android.view.SurfaceHolder;
 
 import java.lang.ref.WeakReference;
@@ -49,8 +50,10 @@ public class MyWatchFace extends CanvasWatchFaceService {
 
     private static final int LEFT_COMPLICATION_ID = 0;
     private static final int RIGHT_COMPLICATION_ID = 1;
+    private static final int TOP_COMPLICATION_ID = 2;
+    public static final int BOTTOM_COMPLICATION_ID = 3;
 
-    private static final int[] COMPLICATION_IDS = {LEFT_COMPLICATION_ID, RIGHT_COMPLICATION_ID};
+    private static final int[] COMPLICATION_IDS = {LEFT_COMPLICATION_ID, RIGHT_COMPLICATION_ID, TOP_COMPLICATION_ID, BOTTOM_COMPLICATION_ID};
 
     // Left and right dial supported types.
     private static final int[][] COMPLICATION_SUPPORTED_TYPES = {
@@ -58,13 +61,15 @@ public class MyWatchFace extends CanvasWatchFaceService {
                     ComplicationData.TYPE_RANGED_VALUE,
                     ComplicationData.TYPE_ICON,
                     ComplicationData.TYPE_SHORT_TEXT,
-                    ComplicationData.TYPE_SMALL_IMAGE
+                    ComplicationData.TYPE_SMALL_IMAGE,
+                    ComplicationData.TYPE_LONG_TEXT
             },
             {
                     ComplicationData.TYPE_RANGED_VALUE,
                     ComplicationData.TYPE_ICON,
                     ComplicationData.TYPE_SHORT_TEXT,
-                    ComplicationData.TYPE_SMALL_IMAGE
+                    ComplicationData.TYPE_SMALL_IMAGE,
+                    ComplicationData.TYPE_LONG_TEXT
             }
     };
 
@@ -77,6 +82,10 @@ public class MyWatchFace extends CanvasWatchFaceService {
                 return LEFT_COMPLICATION_ID;
             case RIGHT:
                 return RIGHT_COMPLICATION_ID;
+            case TOP:
+                return TOP_COMPLICATION_ID;
+            case BOTTOM:
+                return BOTTOM_COMPLICATION_ID;
             default:
                 return -1;
         }
@@ -95,6 +104,10 @@ public class MyWatchFace extends CanvasWatchFaceService {
             case LEFT:
                 return COMPLICATION_SUPPORTED_TYPES[0];
             case RIGHT:
+                return COMPLICATION_SUPPORTED_TYPES[1];
+            case TOP:
+                return COMPLICATION_SUPPORTED_TYPES[1];
+            case BOTTOM:
                 return COMPLICATION_SUPPORTED_TYPES[1];
             default:
                 return new int[]{};
@@ -146,8 +159,12 @@ public class MyWatchFace extends CanvasWatchFaceService {
         private static final float CENTER_GAP_AND_CIRCLE_RADIUS = 4f;
 
         private static final int SHADOW_RADIUS = 6;
+
+        private final float LONG_TEXT_COMPLICATION_RADIUS = 7f;
+
         /* Handler to update the time once a second in interactive mode. */
         private final Handler mUpdateTimeHandler = new EngineHandler( this );
+
         private Calendar mCalendar;
 
         private SparseArray<ComplicationData> mActiveComplicationDataSparseArray;
@@ -191,6 +208,11 @@ public class MyWatchFace extends CanvasWatchFaceService {
             super.onCreate( holder );
 
             setWatchFaceStyle( new WatchFaceStyle.Builder( MyWatchFace.this )
+                    .setStatusBarGravity( Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL
+                            | Gravity.TOP )
+                    .setViewProtectionMode( WatchFaceStyle.PROTECT_STATUS_BAR
+                            | WatchFaceStyle.PROTECT_HOTWORD_INDICATOR )
+                    .setHideNotificationIndicator( true )
                     .setAcceptsTapEvents( true )
                     .build() );
 
@@ -234,9 +256,23 @@ public class MyWatchFace extends CanvasWatchFaceService {
                 rightComplicationDrawable.setContext( getApplicationContext() );
             }
 
+            ComplicationDrawable topComplicationDrawable =
+                    (ComplicationDrawable) getDrawable( R.drawable.custom_complication_styles );
+            if (topComplicationDrawable != null) {
+                topComplicationDrawable.setContext( getApplicationContext() );
+            }
+
+            ComplicationDrawable bottomComplicationDrawable =
+                    (ComplicationDrawable) getDrawable( R.drawable.custom_complication_styles );
+            if (bottomComplicationDrawable != null) {
+                bottomComplicationDrawable.setContext( getApplicationContext() );
+            }
+
             mComplicationDrawableSparseArray = new SparseArray<>( COMPLICATION_IDS.length );
             mComplicationDrawableSparseArray.put( LEFT_COMPLICATION_ID, leftComplicationDrawable );
             mComplicationDrawableSparseArray.put( RIGHT_COMPLICATION_ID, rightComplicationDrawable );
+            mComplicationDrawableSparseArray.put( TOP_COMPLICATION_ID, topComplicationDrawable );
+            mComplicationDrawableSparseArray.put( BOTTOM_COMPLICATION_ID, bottomComplicationDrawable );
 
             setActiveComplications( COMPLICATION_IDS );
         }
@@ -410,7 +446,7 @@ public class MyWatchFace extends CanvasWatchFaceService {
                 initGrayBackgroundBitmap();
             }
 
-            int sizeOfComplication = width / 4;
+            int sizeOfComplication = width / 5;
             int midpointOfScreen = width / 2;
 
             int horizontalOffset = (midpointOfScreen - sizeOfComplication) / 2;
@@ -424,7 +460,7 @@ public class MyWatchFace extends CanvasWatchFaceService {
                             (horizontalOffset + sizeOfComplication),
                             (verticalOffset + sizeOfComplication) );
 
-            ComplicationDrawable leftComplicationDrawable =
+            final ComplicationDrawable leftComplicationDrawable =
                     mComplicationDrawableSparseArray.get( LEFT_COMPLICATION_ID );
             leftComplicationDrawable.setBounds( leftBounds );
 
@@ -436,9 +472,47 @@ public class MyWatchFace extends CanvasWatchFaceService {
                             (midpointOfScreen + horizontalOffset + sizeOfComplication),
                             (verticalOffset + sizeOfComplication) );
 
-            ComplicationDrawable rightComplicationDrawable =
+            final ComplicationDrawable rightComplicationDrawable =
                     mComplicationDrawableSparseArray.get( RIGHT_COMPLICATION_ID );
             rightComplicationDrawable.setBounds( rightBounds );
+
+            final float offset = 6f; //offset for TOP & BOTTOM complications
+
+            final Rect topBounds =
+                    new Rect(
+                            verticalOffset,
+                            horizontalOffset,
+                            verticalOffset + sizeOfComplication,
+                            horizontalOffset + sizeOfComplication
+                    );
+            final ComplicationDrawable topComplicationDrawable =
+                    mComplicationDrawableSparseArray.get( TOP_COMPLICATION_ID );
+            topComplicationDrawable.setBounds( topBounds );
+
+            final Rect bottomBounds = createComplicationRect( mCenterX, mCenterY * 1.5f + offset,
+                    LONG_TEXT_COMPLICATION_RADIUS );
+            final ComplicationDrawable bottomComplicationDrawable =
+                    mComplicationDrawableSparseArray.get( BOTTOM_COMPLICATION_ID );
+            bottomComplicationDrawable.setBounds( bottomBounds );
+        }
+
+        private Rect createComplicationRect(float centerX, float centerY, float desiredRadius) {
+            final int radius = Math.round( mCenterX / desiredRadius );
+
+            final int centerXInt = Math.round( centerX );
+            final int centerYInt = Math.round( centerY );
+
+            //creates the width to the Rect
+            final int magicNumber = Math.round( scalePosition( mCenterX, 4f ) );
+
+            return new Rect( centerXInt - radius - magicNumber,
+                    centerYInt - radius,
+                    centerXInt + radius + magicNumber,
+                    centerYInt + radius );
+        }
+
+        private float scalePosition(float centerCoord, float scale) {
+            return ((centerCoord * 2) / scale);
         }
 
         private void initGrayBackgroundBitmap() {
@@ -648,6 +722,12 @@ public class MyWatchFace extends CanvasWatchFaceService {
                     CENTER_GAP_AND_CIRCLE_RADIUS,
                     mHourPaint );
 
+            canvas.drawCircle(
+                    mCenterX,
+                    mCenterY,
+                    CENTER_GAP_AND_CIRCLE_RADIUS + 2,
+                    mTickAndCirclePaint );
+
             if (!mAmbient) {
                 canvas.rotate( secondsRotation - minutesRotation, mCenterX, mCenterY );
                 canvas.drawLine(
@@ -658,11 +738,12 @@ public class MyWatchFace extends CanvasWatchFaceService {
                         mSecondPaint );
 
             }
+
             canvas.drawCircle(
                     mCenterX,
                     mCenterY,
                     CENTER_GAP_AND_CIRCLE_RADIUS,
-                    mTickAndCirclePaint );
+                    mSecondPaint );
 
             canvas.restore();
         }
