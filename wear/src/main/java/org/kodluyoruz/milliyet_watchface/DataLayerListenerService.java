@@ -25,6 +25,7 @@ public class DataLayerListenerService extends WearableListenerService {
     public static final String TITLE_KEY = "title";
     public static final String SUMMARY_KEY = "summary";
     public static final String IMAGE_KEY = "photo";
+    public static final String ID_KEY = "id";
     private static final String TAG = "DataLayerListenerService";
     private static final String BUNDLE_PATH = "/bundle";
     private Context mContext;
@@ -49,8 +50,9 @@ public class DataLayerListenerService extends WearableListenerService {
 
                     Asset photoAsset = dataMapItem.getDataMap().getAsset("photo");
 
-                    String title = dataMapItem.getDataMap().getString("title");
-                    String summary = dataMapItem.getDataMap().getString("summary");
+                    String title = dataMapItem.getDataMap().getString(TITLE_KEY);
+                    String summary = dataMapItem.getDataMap().getString(SUMMARY_KEY);
+                    String newsId = dataMapItem.getDataMap().getString(ID_KEY);
                     Bitmap bitmap = loadBitmapFromAsset(photoAsset);
 
                     String bitmapArray = convertBitmapToString(bitmap);
@@ -62,6 +64,7 @@ public class DataLayerListenerService extends WearableListenerService {
                     editor.putString(TITLE_KEY, title);
                     editor.putString(SUMMARY_KEY, summary);
                     editor.putString(IMAGE_KEY, bitmapArray);
+                    editor.putString(ID_KEY, newsId);
 
                     editor.apply();
 

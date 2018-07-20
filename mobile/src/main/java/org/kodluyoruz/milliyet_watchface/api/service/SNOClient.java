@@ -1,5 +1,6 @@
 package org.kodluyoruz.milliyet_watchface.api.service;
 
+import org.kodluyoruz.milliyet_watchface.api.model.DataList;
 import org.kodluyoruz.milliyet_watchface.api.model.GitHubRepo;
 import org.kodluyoruz.milliyet_watchface.api.model.SNODataClass;
 
@@ -20,4 +21,7 @@ public interface SNOClient {
     Call<List<GitHubRepo>> reposForGitHub(
             @Path("user") String user
     );
+
+    @GET("/v2/tags/1/stories")
+    Call<DataList> reposForLastNews();
 }

@@ -16,12 +16,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.wearable.Asset;
-import com.google.android.gms.wearable.DataClient;
 import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
@@ -51,24 +51,28 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String TAG = "MainActivity";
 
-    private static final int REQUEST_IMAGE_CAPTURE = 1;
-
     public static final int NOTIFICATION_ID = 888;
+
     private static final String MESSAGE_TITLE = "title";
     private static final String MESSAGE_SUMMARY = "summary";
     private static final String BUNDLE_PATH = "/bundle";
     private static final String IMAGE_KEY = "photo";
     private static final String TIME_KEY = "time";
+    private static final String NEWSID_KEY = "id";
+
     private Context mContext;
-    private DataClient mDataClient;
 
     private NotificationManagerCompat mNotificationManagerCompat;
 
-    private ImageView imageView;
+    private String repoId;
     private String summary;
     private String title;
     private String imageUrl;
     private Bitmap bitmapImage;
+
+    private TextView textTitle;
+    private TextView textSummary;
+    private ImageView imageView;
 
     private static Asset toAsset(Bitmap bitmap) {
         ByteArrayOutputStream byteStream = null;
@@ -87,31 +91,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        mContext = getApplicationContext();
-
-        mNotificationManagerCompat = NotificationManagerCompat.from(getApplicationContext());
-
-        imageView = findViewById(R.id.main_activity_imageview);
-
-        //mDataClient = Wearable.getDataClient(this);
-
-        sendRequest();
-
-
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        mDataClient = Wearable.getDataClient(this);
-    }
-
     private Bitmap bitmapFromUrl(String imageUrl) {
 
         Picasso.with(mContext).load(imageUrl).into(new Target() {
@@ -119,14 +98,6 @@ public class MainActivity extends AppCompatActivity {
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                 Log.i(TAG, "The image was obtained correctly");
                 bitmapImage = bitmap;
-
-//                if(mDataClient != null) {
-//                    Log.d(TAG, "mDataClient:" + mDataClient.toString());
-//                    sendData(toAsset(bitmap), title, summary);
-//                }
-//                sendImage(toAsset(bitmapImage));
-//                sendTitleSummaryImage(title, summary);
-
             }
 
             @Override
@@ -140,23 +111,43 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
         return bitmapImage;
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        mContext = getApplicationContext();
+
+        mNotificationManagerCompat = NotificationManagerCompat.from(getApplicationContext());
+
+        imageView = findViewById(R.id.main_activity_imageview);
+        textSummary = findViewById(R.id.summary);
+        textTitle = findViewById(R.id.title);
+
+        repoId = "39866";
+
+        sendRequest();
     }
 
     private void sendRequest() {
         SNOClient client = ServiceGenerator.createService(SNOClient.class);
-        Call<SNODataClass> call = client.reposForUser("39102");
+        Call<SNODataClass> call = client.reposForUser(repoId);
 
         call.enqueue(new Callback<SNODataClass>() {
             @Override
             public void onResponse(Call<SNODataClass> call, Response<SNODataClass> response) {
                 SNODataClass snoDataClass = response.body();
                 List<Images> imagesResult = Arrays.asList(response.body().getData().getImages());
+
                 imageUrl = imagesResult.get(0).getBaseUrl() + imagesResult.get(0).getName();
                 title = snoDataClass.getData().getTitle();
                 summary = snoDataClass.getData().getSummary();
 
+                textTitle.setText(title);
+                textSummary.setText(summary);
                 Picasso.with(mContext).load(imageUrl).into(imageView);
 
                 bitmapImage = bitmapFromUrl(imageUrl);
@@ -168,47 +159,53 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-//        ServiceGenerator.changeApiBaseUrl( "https://api.github.com/" );
-//        SNOClient clientGitHub = ServiceGenerator.createService( SNOClient.class );
-//        Call<List<GitHubRepo>> repoCall = clientGitHub.reposForGitHub( "cangur" );
+//        final List<Data> lastNewsArrayList = new ArrayList<>();
+//        final ArrayList<String> sendID = new ArrayList<>();
 //
-//        repoCall.enqueue( new Callback<List<GitHubRepo>>() {
+//        Call<DataList> repoCall = client.reposForLastNews();
+//        repoCall.enqueue(new Callback<DataList>() {
 //            @Override
-//            public void onResponse(Call<List<GitHubRepo>> call, Response<List<GitHubRepo>> response) {
-//                response.body();
+//            public void onResponse(Call<DataList> call, Response<DataList> response) {
+//                lastNewsArrayList.addAll(response.body().getData());
+//                for (int i = 0; i < 25; i++) {
+//                    sendID.add(i, lastNewsArrayList.get(i).getId());
+//                }
 //            }
 //
 //            @Override
-//            public void onFailure(Call<List<GitHubRepo>> call, Throwable t) {
+//            public void onFailure(Call<DataList> call, Throwable t) {
 //
 //            }
-//        } );
-
+//        });
     }
 
-//    private void sendTitleSummaryImage(String title, String summary) {
-//        PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(MESSAGE_PATH);
-//        putDataMapRequest.getDataMap().putString(MESSAGE_TITLE, title);
-//        putDataMapRequest.getDataMap().putString(MESSAGE_SUMMARY, summary);
-//        PutDataRequest putDataRequest = putDataMapRequest.asPutDataRequest();
-//        putDataRequest.setUrgent();
+//        final List<Data> lastNewsArrayList = new ArrayList<>();
+//        final ArrayList<SendData> sendData = new ArrayList<>();
 //
-//        Task<DataItem> putDataTask = mDataClient.putDataItem(putDataRequest);
+//        Call<DataList> repoCall = client.reposForLastNews();
+//        repoCall.enqueue(new Callback<DataList>() {
+//            @Override
+//            public void onResponse(Call<DataList> call, Response<DataList> response) {
+//                lastNewsArrayList.addAll(response.body().getData());
+//                List<Images> images;
+//                for (int i = 0; i < 25; i++) {
+//                    images = Arrays.asList(response.body().getData().get(i).getImages());
+//                    sendData.add(i, new SendData(
+//                            lastNewsArrayList.get(i).getId(),
+//                            lastNewsArrayList.get(i).getTitle(),
+//                            lastNewsArrayList.get(i).getSummary(),
+//                            images.get(0).getBaseUrl() + images.get(0).getName(),
+//                            lastNewsArrayList.get(i).getContent()));
+//                }
+//            }
 //
-//        putDataTask
-//                .addOnSuccessListener(new OnSuccessListener<DataItem>() {
-//                    @Override
-//                    public void onSuccess(DataItem dataItem) {
-//                        Log.d(TAG, "Sending message successful: " + dataItem);
-//                    }
-//                })
-//                .addOnFailureListener(new OnFailureListener() {
-//                    @Override
-//                    public void onFailure(@NonNull Exception e) {
-//                        Log.d(TAG, "Sending message was unsuccess:" + e.getMessage());
-//                    }
-//                });
-//    }
+//            @Override
+//            public void onFailure(Call<DataList> call, Throwable t) {
+//
+//            }
+//        });
+
+
 
     private void sendData(Asset asset, String title, String summary) {
         PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(BUNDLE_PATH);
@@ -216,10 +213,12 @@ public class MainActivity extends AppCompatActivity {
         putDataMapRequest.getDataMap().putLong(TIME_KEY, new Date().getTime());
         putDataMapRequest.getDataMap().putString(MESSAGE_TITLE, title);
         putDataMapRequest.getDataMap().putString(MESSAGE_SUMMARY, summary);
+        putDataMapRequest.getDataMap().putString(NEWSID_KEY, repoId);
+
         PutDataRequest putDataRequest = putDataMapRequest.asPutDataRequest();
         putDataRequest.setUrgent();
 
-        Task<DataItem> putDataTask = mDataClient.putDataItem(putDataRequest);
+        Task<DataItem> putDataTask = Wearable.getDataClient(this).putDataItem(putDataRequest);
 
         putDataTask
                 .addOnSuccessListener(new OnSuccessListener<DataItem>() {
@@ -234,13 +233,11 @@ public class MainActivity extends AppCompatActivity {
                         Log.d(TAG, "Sending bundle was unsuccess:" + e.getMessage());
                     }
                 });
-
     }
 
     public void onClick(View view) {
         boolean areNotificationsEnabled = mNotificationManagerCompat.areNotificationsEnabled();
 
-        // Open notification in Settings
         if (!areNotificationsEnabled) {
             openNotificationSettingsForApp();
         }
@@ -249,6 +246,7 @@ public class MainActivity extends AppCompatActivity {
 
         generateBigTextStyleNotification();
     }
+
 
     private void generateBigTextStyleNotification() {
         Log.d(TAG, "generateBigTextStyleNotification()");
@@ -300,8 +298,6 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         mNotificationManagerCompat.notify(NOTIFICATION_ID, notification);
-
-
     }
 
     private void openNotificationSettingsForApp() {

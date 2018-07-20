@@ -10,6 +10,7 @@ import android.support.wearable.complications.ComplicationProviderService;
 import android.support.wearable.complications.ComplicationText;
 import android.util.Base64;
 import android.util.Log;
+import android.widget.Toast;
 
 public class CustomComplicationProviderService extends ComplicationProviderService {
 
@@ -32,30 +33,34 @@ public class CustomComplicationProviderService extends ComplicationProviderServi
             return;
         }
 
-        SharedPreferences preferences = getSharedPreferences(CustomComplicationProviderService.PREFERENCES_NAME, 0);
+        if (dataType == ComplicationData.TYPE_LONG_TEXT) {
+            SharedPreferences preferences = getSharedPreferences(CustomComplicationProviderService.PREFERENCES_NAME, 0);
 
-        String summary = preferences.getString(DataLayerListenerService.SUMMARY_KEY, "Bir hata meydana geldi.");
-        String title = preferences.getString(DataLayerListenerService.TITLE_KEY, "Error: ");
-        String encodedString = preferences.getString(DataLayerListenerService.IMAGE_KEY, "");
+            String summary = preferences.getString(DataLayerListenerService.SUMMARY_KEY, "Bir hata meydana geldi.");
+            String title = preferences.getString(DataLayerListenerService.TITLE_KEY, "Error: ");
+            String encodedString = preferences.getString(DataLayerListenerService.IMAGE_KEY, "");
 
-        Bitmap bitmap = null;
+            Bitmap bitmap = null;
 
-        try {
-            byte[] encodeByte = Base64.decode(encodedString, Base64.DEFAULT);
-            bitmap = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
+            try {
+                byte[] encodeByte = Base64.decode(encodedString, Base64.DEFAULT);
+                bitmap = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
 
-            ComplicationData data = new ComplicationData.Builder(dataType)
-                    .setLongText(
-                            ComplicationText.plainText(summary))
-                    .setLongTitle(
-                            ComplicationText.plainText(title))
-                    .setSmallImage(Icon.createWithBitmap(bitmap))
-                    .build();
+                ComplicationData data = new ComplicationData.Builder(dataType)
+                        .setLongText(
+                                ComplicationText.plainText(title))
+                        .setLongTitle(
+                                ComplicationText.plainText(summary))
+                        .setSmallImage(Icon.createWithBitmap(bitmap))
+                        .build();
 
-            complicationManager.updateComplicationData(complicationId, data);
+                complicationManager.updateComplicationData(complicationId, data);
 
-        } catch (Exception e) {
-            e.getMessage();
+            } catch (Exception e) {
+                e.getMessage();
+            }
+        } else {
+            Toast.makeText(this, "Sadece alt widget için geçerli.", Toast.LENGTH_SHORT).show();
         }
     }
 
