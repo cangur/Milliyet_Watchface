@@ -20,7 +20,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".BigTextMainActivity"></activity>
+        <activity android:name=".BigTextMainActivity" />
+        <activity android:name=".NameActivity"></activity>
+
+        <service android:name=".ListenerService">
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
+                <data
+                    android:host="*"
+                    android:path="/wearable_data"
+                    android:scheme="wear" />
+            </intent-filter>
+        </service>
+
     </application>
 
 </manifest>
