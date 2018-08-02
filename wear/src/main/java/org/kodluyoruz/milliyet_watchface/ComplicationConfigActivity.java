@@ -19,7 +19,7 @@ import java.util.concurrent.Executors;
 
 public class ComplicationConfigActivity extends Activity implements View.OnClickListener {
 
-    private static final String TAG = "ConfigActivity";
+    private static final String TAG = "ComplicationConfigActivity";
 
     static final int COMPLICATION_CONFIG_REQUEST_CODE = 1001;
 

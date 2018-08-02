@@ -1,13 +1,15 @@
 package org.kodluyoruz.milliyet_watchface.api.model;
 
-public class SNODataClass {
-    private Data data;
+import java.util.List;
 
-    public Data getData() {
+public class DataList {
+    private List<Data> data;
+
+    public List<Data> getData() {
         return data;
     }
 
-    public void setData(Data data) {
+    public void setData(List<Data> data) {
         this.data = data;
     }
 
