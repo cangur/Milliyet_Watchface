@@ -4,7 +4,7 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "org.kodluyoruz.milliyet_watchface"
-        minSdkVersion 26
+        minSdkVersion 25
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
@@ -32,8 +32,7 @@ dependencies {
     compileOnly 'com.google.android.wearable:wearable:2.3.0'
 
     // Added Libs
-    implementation 'com.ryanjeffreybrooks:indefinitepagerindicator:1.0.9'
-    implementation 'com.squareup.picasso:picasso:2.5.2'
+    implementation 'me.zhanghai.android.materialprogressbar:library:1.4.2'
 
 
 }

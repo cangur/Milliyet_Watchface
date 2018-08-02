@@ -1,4 +1,4 @@
-package org.kodluyoruz.milliyet_watchface;
+package org.kodluyoruz.milliyet_watchface.ui;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -6,9 +6,14 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.view.ViewPager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PagerSnapHelper;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SnapHelper;
+import android.support.wear.widget.CircularProgressLayout;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -25,37 +30,40 @@ import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 
+import org.kodluyoruz.milliyet_watchface.NewsDTO;
+import org.kodluyoruz.milliyet_watchface.R;
+import org.kodluyoruz.milliyet_watchface.adapter.NewsListAdapter;
+
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-public class NewsDetailActivity extends WearableActivity implements DataClient.OnDataChangedListener {
+public class NewsListActivity extends WearableActivity implements DataClient.OnDataChangedListener {
 
-    public final String ID_KEY = "newsID";
+    private final String TAG = "NewsListActivity";
+
     private final String LAST_NEWS_KEY = "news_datamap";
-    private final String TAG = "NewsDetailActivity";
     private final String SEND_ID_KEY = "send_id";
     private final String SEND_ID_PATH = "/sending_id";
     private final String WEAR_LASTNEWS_PATH = "/last_news_path";
-    NewsDTO newsDTO;
 
-    ViewPager viewPager;
+    NewsDTO[] newsDTO;
 
-    Context mContext;
-
-
+    private Context mContext;
+    private RecyclerView recyclerView;
     private TextView mTextView;
+    private CircularProgressLayout bar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_news_detail);
+        setContentView(R.layout.activity_news_list);
 
         mTextView = findViewById(R.id.text);
-        viewPager = findViewById(R.id.viewpager);
+        recyclerView = findViewById(R.id.activity_newsdetail_rv_news);
+        bar = findViewById(R.id.progress_bar);
 
         // Enables Always-on
         setAmbientEnabled();
@@ -100,7 +108,6 @@ public class NewsDetailActivity extends WearableActivity implements DataClient.O
 
     @Override
     public void onDataChanged(@NonNull DataEventBuffer dataEventBuffer) {
-        newsDTO = new NewsDTO();
         for (DataEvent event : dataEventBuffer) {
             if (event.getType() == DataEvent.TYPE_CHANGED) {
 
@@ -111,8 +118,7 @@ public class NewsDetailActivity extends WearableActivity implements DataClient.O
                     List<DataMap> lastNewsData = dataMapItem.getDataMap().getDataMapArrayList(LAST_NEWS_KEY);
 
                     Iterator<DataMap> itr = lastNewsData.iterator();
-                    ArrayList<NewsDTO> mNewsDTO = new ArrayList<>();
-                    NewsDTO[] newsDTO = new NewsDTO[25];
+                    newsDTO = new NewsDTO[25];
                     int index = 0;
                     while (itr.hasNext()) {
                         DataMap newsData = itr.next();
@@ -125,9 +131,7 @@ public class NewsDetailActivity extends WearableActivity implements DataClient.O
 
                         try {
                             newsDTO[index].newsBitmap = new LoadBitmapAsyncTask().execute(newsData.getAsset("image")).get();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        } catch (ExecutionException e) {
+                        } catch (InterruptedException | ExecutionException e) {
                             e.printStackTrace();
                         }
 
@@ -135,11 +139,24 @@ public class NewsDetailActivity extends WearableActivity implements DataClient.O
 
                     }
 
-                    //SliderAdapter sliderAdapter = new SliderAdapter(getApplicationContext(), newsDTO);
-                    //viewPager.setAdapter(sliderAdapter);
+                    toAdapter(newsDTO);
                 }
             }
         }
+    }
+
+    private void toAdapter(NewsDTO[] newsDTO) {
+        NewsListAdapter adapter = new NewsListAdapter(newsDTO, getApplicationContext());
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(adapter);
+
+        SnapHelper snapHelper = new PagerSnapHelper();
+        snapHelper.attachToRecyclerView(recyclerView);
+
+        bar.setVisibility(View.INVISIBLE);
+
+
     }
 
     private class LoadBitmapAsyncTask extends AsyncTask<Asset, Void, Bitmap> {

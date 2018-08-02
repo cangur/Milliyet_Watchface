@@ -29,6 +29,8 @@ import android.util.SparseArray;
 import android.view.Gravity;
 import android.view.SurfaceHolder;
 
+import org.kodluyoruz.milliyet_watchface.ui.NotificationContentActivity;
+
 import java.lang.ref.WeakReference;
 import java.util.Calendar;
 import java.util.TimeZone;

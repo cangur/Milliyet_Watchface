@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black"
+    android:orientation="vertical"
+    android:padding="@dimen/box_inset_layout_padding"
+    tools:context=".ui.NotificationContentActivity"
+    tools:deviceIds="wear">
+
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop">
+
+
+        <ImageView
+            android:id="@+id/rv_imageview_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true"
+            android:scaleType="centerCrop"
+            android:src="@drawable/bg" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/gradient_bg" />
+
+        <org.kodluyoruz.milliyet_watchface.CanaroTextView
+            android:id="@+id/rv_tv_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:padding="30dp"
+            android:text="Haber Haber Başlık Haber Başlık"
+            android:textColor="#ffffffff"
+            android:textSize="18dp" />
+
+
+    </FrameLayout>
+
+</LinearLayout>

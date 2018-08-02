@@ -22,7 +22,6 @@ import com.google.android.gms.wearable.WearableListenerService;
 
 import org.kodluyoruz.milliyet_watchface.api.model.Data;
 import org.kodluyoruz.milliyet_watchface.api.model.DataList;
-import org.kodluyoruz.milliyet_watchface.api.model.Images;
 import org.kodluyoruz.milliyet_watchface.api.service.SNOClient;
 import org.kodluyoruz.milliyet_watchface.api.service.ServiceGenerator;
 
@@ -114,14 +113,6 @@ public class ListenerService extends WearableListenerService {
 
         final List<Data> lastNewsArrayList = new ArrayList<>();
 
-        final ArrayList<String> sendID = new ArrayList<>();
-        final ArrayList<String> sendTitle = new ArrayList<>();
-        final ArrayList<String> sendSummary = new ArrayList<>();
-        final ArrayList<String> sendContent = new ArrayList<>();
-        final ArrayList<String> sendURL = new ArrayList<>();
-
-        final List<Images>[] images = new List[25];
-
         final ArrayList<DataMap> allNewsData = new ArrayList<>(25);
 
         Call<DataList> repoCall = client.reposForLastNews();
@@ -162,43 +153,7 @@ public class ListenerService extends WearableListenerService {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-
                     Log.d(TAG, "allNewsData: " + allNewsData.size());
-
-
-//                    Picasso.with(mContext).load(response.body().getData().get(i).getImages()[0].getBaseUrl().split("images")[0]+"100x100/images/"
-//                            + response.body().getData().get(i).getImages()[0].getName())
-//                            .into(new Target() {
-//                                @Override
-//                                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-//                                    DataMap newsData = new DataMap();
-//
-//                                    newsData.putString("title", lastNewsArrayList.get(index).getTitle());
-//                                    newsData.putString("summary", lastNewsArrayList.get(index).getSummary());
-//                                    newsData.putString("content", lastNewsArrayList.get(index).getContent());
-//                                    newsData.putString("id", lastNewsArrayList.get(index).getId());
-//                                    newsData.putAsset("image", createAssetFromBitmap(bitmap));
-//
-//                                    allNewsData.add(newsData);
-//
-//                                    if(allNewsData.size() == 25 - failedCount){
-//                                        Log.d(TAG, "dsdsadasd");
-//                                        //sendLastNewsData(sendID, sendContent, sendSummary, sendTitle, sendURL);
-//                                    }
-//                                }
-//
-//                                @Override
-//                                public void onBitmapFailed(Drawable errorDrawable) {
-//
-//                                    failedCount++;
-//                                }
-//
-//                                @Override
-//                                public void onPrepareLoad(Drawable placeHolderDrawable) {
-//                                    Log.d(TAG, "22222");
-//                                }
-//                            });
-
                 }
             }
 

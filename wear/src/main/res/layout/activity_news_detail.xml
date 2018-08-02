@@ -1,15 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.wear.widget.BoxInsetLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_newsdetail_scroll_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/dark_grey"
+    android:background="@color/black"
     android:padding="@dimen/box_inset_layout_padding"
-    tools:context=".NewsDetailActivity"
+    tools:context=".ui.NotificationContentActivity"
     tools:deviceIds="wear">
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/viewpager"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-</android.support.wear.widget.BoxInsetLayout>
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop">
+
+            <ImageView
+                android:id="@+id/activity_newsdetail_imageview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fitsSystemWindows="true"
+                android:scaleType="centerCrop"
+                android:src="@drawable/bg" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/gradient_bg" />
+
+            <org.kodluyoruz.milliyet_watchface.CanaroTextView
+                android:id="@+id/activity_newsdetail_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:paddingLeft="6dp"
+                android:text="Haber Haber Başlık Haber Başlık"
+                android:textColor="#ffffffff"
+                android:textSize="22dp" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="12dp"
+            android:orientation="horizontal">
+
+
+            <ImageButton
+                android:id="@+id/activity_newsdetail_btn_voice"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="left|center_vertical"
+                android:background="@drawable/ic_volume_up_black_24dp" />
+
+
+            <TextView
+                android:id="@+id/activity_newsdetail_tv_readnews"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="6dp"
+                android:fontFamily="sans-serif"
+                android:text="Haberi Sesli Oku" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/activity_newsdetail_summary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:paddingLeft="16dp"
+            android:text="Haber içerik. ,Haber içerik. Haber içerik. Haber içerik. Haber içerik. Haber içerik. Haber içerik. Haber içerik. Haber içerik."
+            android:textColor="@color/white"
+            android:textStyle="italic" />
+
+        <TextView
+            android:id="@+id/activity_newsdetail_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:fontFamily="sans-serif-light"
+            android:paddingLeft="16dp"
+            android:text="Haber içerik. ,Haber içerik. Haber içerik. Haber içerik. Haber içerik. Haber içerik. Haber içerik. Haber içerik. Haber içerik."
+            android:textColor="@color/white" />
+
+        <ImageButton
+            android:id="@+id/activity_newsdetail_btn_openOnApp"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="30dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/ic_phone_android_black_24dp" />
+
+
+    </LinearLayout>
+</ScrollView>

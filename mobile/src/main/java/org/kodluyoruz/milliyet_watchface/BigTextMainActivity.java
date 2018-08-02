@@ -35,6 +35,7 @@ public class BigTextMainActivity extends AppCompatActivity {
     private TextView tvSummary;
     private TextView tvID;
     private String mID;
+    private String fromNotifyID;
     private String summary;
     private String title;
     private String imageUrl;
@@ -45,13 +46,13 @@ public class BigTextMainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate( savedInstanceState );
-        setContentView( R.layout.activity_big_text_main );
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_big_text_main);
 
         NotificationManager notificationManager =
-                (NotificationManager) getSystemService( Context.NOTIFICATION_SERVICE );
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        notificationManager.cancel( MainActivity.NOTIFICATION_ID );
+        notificationManager.cancel(MainActivity.NOTIFICATION_ID);
 
         imageView = findViewById(R.id.imageView);
         tvTitle = findViewById(R.id.title);
@@ -67,6 +68,7 @@ public class BigTextMainActivity extends AppCompatActivity {
         mID = getIntent().getStringExtra(ListenerService.ID_KEY);
         isVoice = getIntent().getBooleanExtra(ListenerService.VOICE_KEY, false);
 
+        fromNotifyID = getIntent().getStringExtra("id");
         sendRequest();
     }
 
@@ -96,6 +98,30 @@ public class BigTextMainActivity extends AppCompatActivity {
                     intent.putExtra("text", text);
                     startActivity(intent);
                 }
+            }
+
+            @Override
+            public void onFailure(Call<SNODataClass> call, Throwable t) {
+
+            }
+        });
+
+        Call<SNODataClass> call_notify = client.reposForUser(fromNotifyID);
+        call_notify.enqueue(new Callback<SNODataClass>() {
+            @Override
+            public void onResponse(Call<SNODataClass> call, Response<SNODataClass> response) {
+                SNODataClass snoDataClass = response.body();
+                List<Images> imagesResult = Arrays.asList(response.body().getData().getImages());
+                imageUrl = imagesResult.get(0).getBaseUrl() + imagesResult.get(0).getName();
+                title = snoDataClass.getData().getTitle();
+                summary = snoDataClass.getData().getSummary();
+
+                tvTitle.setText(title);
+                tvSummary.setText(summary);
+                tvID.setText(fromNotifyID);
+                Picasso.with(mContext).load(imageUrl).into(imageView);
+
+                bitmapImage = bitmapFromUrl(imageUrl);
             }
 
             @Override

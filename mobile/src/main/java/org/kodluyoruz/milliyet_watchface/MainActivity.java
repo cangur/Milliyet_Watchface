@@ -13,8 +13,10 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatEditText;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -47,7 +49,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     public static final String TAG = "MainActivity";
 
@@ -72,6 +74,11 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView textTitle;
     private TextView textSummary;
+    private Button btnGetNews;
+    private Button btnSubmit;
+    private AppCompatEditText edtID;
+
+
     private ImageView imageView;
 
     private static Asset toAsset(Bitmap bitmap) {
@@ -91,29 +98,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private Bitmap bitmapFromUrl(String imageUrl) {
-
-        Picasso.with(mContext).load(imageUrl).into(new Target() {
-            @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                Log.i(TAG, "The image was obtained correctly");
-                bitmapImage = bitmap;
-            }
-
-            @Override
-            public void onBitmapFailed(Drawable errorDrawable) {
-                Log.d(TAG, "The image was not obtained");
-            }
-
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-                Log.d(TAG, "Getting ready to get the image");
-            }
-        });
-
-        return bitmapImage;
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -127,84 +111,18 @@ public class MainActivity extends AppCompatActivity {
         textSummary = findViewById(R.id.summary);
         textTitle = findViewById(R.id.title);
 
-        repoId = "39866";
+        btnGetNews = findViewById(R.id.btn_getnews);
+        btnSubmit = findViewById(R.id.submit);
 
-        sendRequest();
+        edtID = findViewById(R.id.edt_id);
+
+        btnGetNews.setOnClickListener(this);
+        btnSubmit.setOnClickListener(this);
+
+        btnSubmit.setEnabled(false);
+
+
     }
-
-    private void sendRequest() {
-        SNOClient client = ServiceGenerator.createService(SNOClient.class);
-        Call<SNODataClass> call = client.reposForUser(repoId);
-
-        call.enqueue(new Callback<SNODataClass>() {
-            @Override
-            public void onResponse(Call<SNODataClass> call, Response<SNODataClass> response) {
-                SNODataClass snoDataClass = response.body();
-                List<Images> imagesResult = Arrays.asList(response.body().getData().getImages());
-
-                imageUrl = imagesResult.get(0).getBaseUrl() + imagesResult.get(0).getName();
-                title = snoDataClass.getData().getTitle();
-                summary = snoDataClass.getData().getSummary();
-
-                textTitle.setText(title);
-                textSummary.setText(summary);
-                Picasso.with(mContext).load(imageUrl).into(imageView);
-
-                bitmapImage = bitmapFromUrl(imageUrl);
-            }
-
-            @Override
-            public void onFailure(Call<SNODataClass> call, Throwable t) {
-
-            }
-        });
-
-//        final List<Data> lastNewsArrayList = new ArrayList<>();
-//        final ArrayList<String> sendID = new ArrayList<>();
-//
-//        Call<DataList> repoCall = client.reposForLastNews();
-//        repoCall.enqueue(new Callback<DataList>() {
-//            @Override
-//            public void onResponse(Call<DataList> call, Response<DataList> response) {
-//                lastNewsArrayList.addAll(response.body().getData());
-//                for (int i = 0; i < 25; i++) {
-//                    sendID.add(i, lastNewsArrayList.get(i).getId());
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<DataList> call, Throwable t) {
-//
-//            }
-//        });
-    }
-
-//        final List<Data> lastNewsArrayList = new ArrayList<>();
-//        final ArrayList<SendData> sendData = new ArrayList<>();
-//
-//        Call<DataList> repoCall = client.reposForLastNews();
-//        repoCall.enqueue(new Callback<DataList>() {
-//            @Override
-//            public void onResponse(Call<DataList> call, Response<DataList> response) {
-//                lastNewsArrayList.addAll(response.body().getData());
-//                List<Images> images;
-//                for (int i = 0; i < 25; i++) {
-//                    images = Arrays.asList(response.body().getData().get(i).getImages());
-//                    sendData.add(i, new SendData(
-//                            lastNewsArrayList.get(i).getId(),
-//                            lastNewsArrayList.get(i).getTitle(),
-//                            lastNewsArrayList.get(i).getSummary(),
-//                            images.get(0).getBaseUrl() + images.get(0).getName(),
-//                            lastNewsArrayList.get(i).getContent()));
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<DataList> call, Throwable t) {
-//
-//            }
-//        });
-
 
 
     private void sendData(Asset asset, String title, String summary) {
@@ -235,18 +153,91 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    public void onClick(View view) {
-        boolean areNotificationsEnabled = mNotificationManagerCompat.areNotificationsEnabled();
+    private void sendRequest(String id) {
 
-        if (!areNotificationsEnabled) {
-            openNotificationSettingsForApp();
-        }
+        SNOClient client = ServiceGenerator.createService(SNOClient.class);
+        Call<SNODataClass> call = client.reposForUser(id);
 
-        sendData(toAsset(bitmapImage), title, summary);
+        call.enqueue(new Callback<SNODataClass>() {
+            @Override
+            public void onResponse(Call<SNODataClass> call, Response<SNODataClass> response) {
+                SNODataClass snoDataClass = response.body();
+                List<Images> imagesResult = Arrays.asList(response.body().getData().getImages());
 
-        generateBigTextStyleNotification();
+                imageUrl = imagesResult.get(0).getBaseUrl() + imagesResult.get(0).getName();
+                title = snoDataClass.getData().getTitle();
+                summary = snoDataClass.getData().getSummary();
+
+                textTitle.setText(title);
+                textSummary.setText(summary);
+                Picasso.with(mContext).load(imageUrl).into(new Target() {
+                    @Override
+                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                        bitmapImage = bitmap;
+                        imageView.setImageBitmap(bitmapImage);
+                        btnSubmit.setEnabled(true);
+                    }
+
+                    @Override
+                    public void onBitmapFailed(Drawable errorDrawable) {
+                        Log.d("onBitmapFailed", "failed");
+                    }
+
+                    @Override
+                    public void onPrepareLoad(Drawable placeHolderDrawable) {
+                        Log.d("onPrepareLoad", "preparing");
+                    }
+                });
+
+                //bitmapImage = bitmapFromUrl(imageUrl);
+            }
+
+            @Override
+            public void onFailure(Call<SNODataClass> call, Throwable t) {
+
+            }
+        });
+
     }
 
+    public void onClick(View view) {
+
+        switch (view.getId()) {
+            case R.id.btn_getnews:
+                btnSubmit.setEnabled(false);
+                String id = edtID.getText().toString();
+                if (!id.equals("")) {
+                    repoId = id;
+                    sendRequest(id);
+                }
+
+                break;
+
+            case R.id.submit:
+
+                boolean areNotificationsEnabled = mNotificationManagerCompat.areNotificationsEnabled();
+
+                if (!areNotificationsEnabled) {
+                    openNotificationSettingsForApp();
+                }
+
+                sendData(toAsset(bitmapImage), title, summary);
+
+                generateBigTextStyleNotification();
+
+                break;
+        }
+
+
+    }
+
+    private void openNotificationSettingsForApp() {
+        Intent intent = new Intent();
+        intent.setAction("android.settings.APP_NOTIFICATION_SETTINGS");
+        intent.putExtra("app_package", getPackageName());
+        intent.putExtra("app_uid", getApplicationInfo().uid);
+        startActivity(intent);
+    }
 
     private void generateBigTextStyleNotification() {
         Log.d(TAG, "generateBigTextStyleNotification()");
@@ -255,11 +246,13 @@ public class MainActivity extends AppCompatActivity {
         String notificationChannelId = NotificationUtil.createNotificationChannel(this, bigTextStyleReminderAppData);
 
         NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle()
-                .bigText(bigTextStyleReminderAppData.getBigText())
-                .setBigContentTitle(bigTextStyleReminderAppData.getBigContentTitle())
-                .setSummaryText(bigTextStyleReminderAppData.getSummaryText());
+                .setSummaryText(summary)
+                .bigText(title)
+                .setBigContentTitle("Milliyet");
 
         Intent notifyIntent = new Intent(this, BigTextMainActivity.class);
+
+        notifyIntent.putExtra("id", edtID.getText().toString());
 
         notifyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
@@ -278,33 +271,26 @@ public class MainActivity extends AppCompatActivity {
         GlobalNotificationBuilder.setNotificationCompatBuilderInstance(notificationCompatBuilder);
 
 
-        NotificationCompat.Action mainAction = new NotificationCompat.Action.Builder(R.drawable.ic_launcher, "Open on App", notifyPendingIntent).build();
+        NotificationCompat.Action mainAction = new NotificationCompat.Action.Builder(R.drawable.ic_launcher, "Uygulamada Aç", notifyPendingIntent).build();
 
         Notification notification = notificationCompatBuilder
                 .setStyle(bigTextStyle)
-                .setContentTitle(bigTextStyleReminderAppData.getContentTitle())
-                .setContentText(bigTextStyleReminderAppData.getContentText())
+                .setContentText(summary)
+                .setContentTitle(title)
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setLargeIcon(BitmapFactory.decodeResource(
                         getResources(),
                         R.drawable.ic_launcher_foreground))
                 .setContentIntent(notifyPendingIntent)
                 .setDefaults(NotificationCompat.DEFAULT_ALL)
-                .setColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary))
+                .setColor(ContextCompat.getColor(getApplicationContext(), R.color.red))
                 .setCategory(Notification.CATEGORY_REMINDER)
                 .setPriority(bigTextStyleReminderAppData.getPriority())
                 .setVisibility(bigTextStyleReminderAppData.getChannelLockscreenVisibility())
                 .addAction(mainAction)
                 .build();
 
-        mNotificationManagerCompat.notify(NOTIFICATION_ID, notification);
-    }
 
-    private void openNotificationSettingsForApp() {
-        Intent intent = new Intent();
-        intent.setAction("android.settings.APP_NOTIFICATION_SETTINGS");
-        intent.putExtra("app_package", getPackageName());
-        intent.putExtra("app_uid", getApplicationInfo().uid);
-        startActivity(intent);
+        mNotificationManagerCompat.notify(NOTIFICATION_ID, notification);
     }
 }

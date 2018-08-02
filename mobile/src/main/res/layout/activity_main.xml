@@ -10,35 +10,54 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/spinnerHeadertextView"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Send notification..." />
+        android:layout_margin="12dp"
+        android:orientation="horizontal">
+
+        <android.support.v7.widget.AppCompatEditText
+            android:id="@+id/edt_id"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:hint="News ID" />
+
+        <Button
+            android:id="@+id/btn_getnews"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Get NEWS" />
+
+    </LinearLayout>
+
 
     <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
+        android:layout_height="315dp"
+        android:layout_centerInParent="true"
         android:orientation="vertical">
 
         <ImageView
             android:id="@+id/main_activity_imageview"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_width="match_parent"
+            android:layout_height="142dp"
+            android:layout_gravity="center"
+            android:layout_marginBottom="12dp" />
 
         <TextView
             android:id="@+id/title"
             android:layout_width="wrap_content"
+            android:fontFamily="sans-serif"
+            android:padding="12dp"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp" />
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/summary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp" />
+            android:padding="12dp"
+            android:textStyle="italic" />
     </LinearLayout>
 
     <Button
@@ -47,6 +66,5 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
-        android:onClick="onClick"
         android:text="Launch!" />
 </RelativeLayout>

@@ -86,9 +86,14 @@ public class DataLayerListenerService extends WearableListenerService {
     }
 
     private void sendDataToComplication() {
+        SharedPreferences preferences = getSharedPreferences(CustomComplicationProviderService.PREFERENCES_NAME, 0);
+        int complicationId = preferences.getInt("complication_id", 0);
+
+        Log.d(TAG, "updated complication id: " + complicationId);
+
         ComponentName provider = new ComponentName("org.kodluyoruz.milliyet_watchface", "org.kodluyoruz.milliyet_watchface.CustomComplicationProviderService");
         ProviderUpdateRequester requester = new ProviderUpdateRequester(this, provider);
-        requester.requestUpdate(9);
+        requester.requestUpdate(complicationId);
     }
 
     private Bitmap loadBitmapFromAsset(Asset asset) {
