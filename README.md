@@ -2,7 +2,7 @@
 
 ## Definition:
 
-This is the smart watch app desingning for Wear OS platform to show the latest news to the user. In this project, user can switch between news and be aware of the latest news posted by handheld device (push notification). Handheld side also implemented for testing purposes. The communication between handheld device and smart watch, Data Layer API (Google Play Service) is used.
+This is the smart watch app desingning for Wear OS platform to show the latest news to the user. In this project, user can switch between news and be aware of the latest news posted by handheld device (push notification). Handheld side also implemented for testing purposes. The communication between handheld device and smart watch, Data Layer API (Google Play Service) is used. Incoming new can be open on handheld device. Additionally, this app let user listen news content from handheld device.
 
 ## ScreenShots:
 
