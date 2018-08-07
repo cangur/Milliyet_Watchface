@@ -13,7 +13,7 @@ This is the smart watch app desingning for Wear OS platform to show the latest n
 ![alt text](https://github.com/cangur/Milliyet_Watchface/blob/master/notif.png?raw=true)  |  ![alt text](https://github.com/cangur/Milliyet_Watchface/blob/master/WatchFace.png?raw=true)
 ![alt text](https://github.com/cangur/Milliyet_Watchface/blob/master/core.png?raw=true)  |  ![alt text](https://github.com/cangur/Milliyet_Watchface/blob/master/device-2018-08-07-201502.png?raw=true)
 
-## Captured View (Youtube)
+## Captured Video (Youtube)
 
 #### Core App
 
